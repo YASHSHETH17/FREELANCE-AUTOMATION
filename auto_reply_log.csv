@@ -1,0 +1,10 @@
+sent_at,status,recipient,subject,thread_id,message_id
+2026-08-19T07:15:51.401908+00:00,dry_run,yash sheth <yashsheth955@gmail.com>,hello,1a018df684e4c5e4,1a018df684e4c5e4
+2026-08-19T07:15:51.410273+00:00,dry_run,yash sheth <yashsheth955@gmail.com>,who are you?,1a018de1e90e3ffb,1a018de1e90e3ffb
+2026-08-19T07:17:58.809534+00:00,dry_run,yash sheth <yashsheth955@gmail.com>,test subject,1a018e187f1c9443,1a018e187f1c9443
+2026-08-20T09:59:20.593623+00:00,dry_run,yash <shocked.jammer@gmail.com>,This is a test request,1a01e9c17bb0c7fd,1a01e9c17bb0c7fd
+2026-08-20T09:59:20.595564+00:00,dry_run,yash sheth <yashsheth955@gmail.com>,,1a01dbe9f6428036,1a01dbe9f6428036
+2026-08-20T10:22:55.198351+00:00,dry_run,yash sheth <yashsheth955@gmail.com>,this is a test mail,1a01eae394049b1a,1a01eae394049b1a
+2026-08-20T10:26:42.153212+00:00,dry_run,Yash Sheth <yashsheth59@gmail.com>,Re: Wedding Invitation: [Your Name] & [Partner's Name],1a01eb42116ce7fe,1a01eb4aceb35e4a
+2026-08-20T10:40:55.540941+00:00,sent,yash sheth <yashsheth955@gmail.com>,Send chips,1a01ec1ccded75a8,1a01ec1ccded75a8
+2026-08-20T10:40:56.304829+00:00,sent,Shashwat Shah <shashwat.koffeekodes@gmail.com>,Re: Chips for You!,1a01ec00ba1b209a,1a01ec159e8df2a0
