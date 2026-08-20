@@ -1,6 +1,6 @@
 from langchain_core.tools import tool
 
-from gmail_client import GmailClient
+from email_agent.gmail_client import GmailClient
 
 # First import triggers the browser OAuth flow if token.json is missing or lacks
 # the newly required gmail.send permission.
