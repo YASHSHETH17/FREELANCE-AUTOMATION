@@ -3,8 +3,8 @@ from langchain.agents.middleware import HumanInTheLoopMiddleware
 from langchain.chat_models import init_chat_model
 from langgraph.checkpoint.memory import InMemorySaver
 
-from config import api, model, url,sender_name
-from tools import read_email, recent_inbox_emails, search_emails, send_email
+from email_agent.config import api, model, url,sender_name
+from email_agent.tools import read_email, recent_inbox_emails, search_emails, send_email
 
 SYSTEM_PROMPT = f"""You are a Gmail assistant with read, search, and send abilities.
 

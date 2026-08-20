@@ -6,7 +6,7 @@ from email.utils import getaddresses, parseaddr
 
 from googleapiclient.discovery import build
 
-from auth import get_credentials
+from email_agent.auth import get_credentials
 
 MAX_BODY_CHARS = 8000  # Cap read-tool output to preserve the LLM context.
 
