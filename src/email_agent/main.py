@@ -6,9 +6,9 @@ from uuid import uuid4
 
 from langgraph.types import Command
 
-from email_agent.agent import build_email_agent
-from email_agent.auto_reply import AutoReplyMonitor, recent_auto_replies
-from email_agent.config import AUTO_REPLY_DRY_RUN, AUTO_REPLY_ENABLED
+from src.email_agent.agent import build_email_agent
+from .auto_reply import AutoReplyMonitor, recent_auto_replies
+from src.email_agent.config import AUTO_REPLY_DRY_RUN, AUTO_REPLY_ENABLED
 
 
 def _latest_assistant_text(result: dict[str, Any]) -> str:

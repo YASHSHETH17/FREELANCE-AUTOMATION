@@ -3,21 +3,17 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / ".env")
-
-api = os.environ.get("LLM_API_KEY")
-model = os.environ.get("LLM_MODEL_NAME")
-url = os.environ.get("LLM_BASE_URL")
-
+EMAIL_AGENT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = EMAIL_AGENT_DIR.parent.parent
+load_dotenv(PROJECT_ROOT / ".env")
 # Gmail OAuth: read messages and send messages. Sending is still protected by
 # HumanInTheLoopMiddleware; this scope only allows the Gmail API operation.
 SCOPES = [
     "https://www.googleapis.com/auth/gmail.readonly",
     "https://www.googleapis.com/auth/gmail.send",
 ]
-CREDENTIALS_PATH = BASE_DIR / os.getenv("GMAIL_CREDENTIALS_PATH", "credentials.json")
-TOKEN_PATH = BASE_DIR / os.getenv("GMAIL_TOKEN_PATH", "token.json")
+CREDENTIALS_PATH = EMAIL_AGENT_DIR / "credentials.json"
+TOKEN_PATH = EMAIL_AGENT_DIR / "token.json"
 
 
 def _positive_int(name: str, default: int, minimum: int) -> int:
@@ -38,10 +34,10 @@ AUTO_REPLY_BODY = os.getenv(
     "AUTO_REPLY_BODY",
     "Thank you for your email. I have received your message and will connect with you shortly.",
 ).strip()
-AUTO_REPLY_STATE_PATH = BASE_DIR / os.getenv(
+AUTO_REPLY_STATE_PATH = EMAIL_AGENT_DIR / os.getenv(
     "AUTO_REPLY_STATE_PATH", ".auto_reply_state.json"
 )
-AUTO_REPLY_LOG_PATH = BASE_DIR / os.getenv(
+AUTO_REPLY_LOG_PATH = EMAIL_AGENT_DIR / os.getenv(
     "AUTO_REPLY_LOG_PATH", "auto_reply_log.csv"
 )
 sender_name = os.getenv("SENDER_NAME", "Yash")

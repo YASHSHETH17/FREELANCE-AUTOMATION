@@ -1,6 +1,11 @@
 .env
-credentials.json
-token.json
+# Gmail OAuth secrets — never commit these
+/src/email_agent/credentials.json
+/src/email_agent/token.json
+
+# Previous locations, if they still exist locally
+/credentials.json
+/token.json
 __pycache__/
 
 .auto_reply_state.json

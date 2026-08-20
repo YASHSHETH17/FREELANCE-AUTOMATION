@@ -10,7 +10,7 @@ from email.utils import parseaddr
 from pathlib import Path
 from typing import Any
 
-from email_agent.config import (
+from src.email_agent.config import (
     AUTO_REPLY_BODY,
     AUTO_REPLY_DRY_RUN,
     AUTO_REPLY_MAX_PER_HOUR,
@@ -18,7 +18,7 @@ from email_agent.config import (
     AUTO_REPLY_LOG_PATH,
     AUTO_REPLY_STATE_PATH,
 )
-from email_agent.gmail_client import GmailClient
+from src.email_agent.gmail_client import GmailClient
 
 logger = logging.getLogger("auto_reply")
 
