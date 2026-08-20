@@ -4,3 +4,4 @@ token.json
 __pycache__/
 
 .auto_reply_state.json
+.auto_reply_log.csv
