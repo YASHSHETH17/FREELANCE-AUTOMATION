@@ -2,9 +2,9 @@ from langchain.agents import create_agent
 from langchain.agents.middleware import HumanInTheLoopMiddleware
 from langchain.chat_models import init_chat_model
 from langgraph.checkpoint.memory import InMemorySaver
-
-from email_agent.config import api, model, url,sender_name
-from email_agent.tools import read_email, recent_inbox_emails, search_emails, send_email
+from src.email_agent.config import sender_name
+from src.models import build_chat_model
+from src.email_agent.tools import read_email, recent_inbox_emails, search_emails, send_email
 
 SYSTEM_PROMPT = f"""You are a Gmail assistant with read, search, and send abilities.
 
@@ -36,12 +36,7 @@ urgent or needing a reply."""
 
 def build_email_agent():
     return create_agent(
-        model=init_chat_model(
-            model=model,
-            model_provider="openai",
-            api_key=api,
-            base_url=url,
-        ),
+        model=build_chat_model(),
         tools=[search_emails, recent_inbox_emails, read_email, send_email],
         system_prompt=SYSTEM_PROMPT,
         middleware=[

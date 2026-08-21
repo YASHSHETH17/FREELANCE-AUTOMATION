@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import time
 from datetime import UTC, datetime
@@ -6,7 +7,7 @@ from email.utils import getaddresses, parseaddr
 
 from googleapiclient.discovery import build
 
-from email_agent.auth import get_credentials
+from src.email_agent.auth import get_credentials
 
 MAX_BODY_CHARS = 8000  # Cap read-tool output to preserve the LLM context.
 
@@ -198,12 +199,21 @@ class GmailClient:
         candidates = []
         for item in response.get("messages", []):
             message = self._get(item["id"], format_="metadata")
+            internal_date_ms = int(message.get("internalDate", 0))
             candidates.append(
                 {
                     "id": item["id"],
                     "thread_id": message.get("threadId", ""),
                     "label_ids": message.get("labelIds", []),
                     "headers": _header_map(message),
+                    "received_at": (
+                        datetime.fromtimestamp(internal_date_ms / 1000, tz=UTC)
+                        .astimezone()
+                        .isoformat(timespec="seconds")
+                        if internal_date_ms
+                        else ""
+                    ),
+                    "snippet": message.get("snippet", ""),
                 }
             )
         return candidates
@@ -257,3 +267,34 @@ class GmailClient:
             .get(userId="me", id=message_id, format=format_)
             .execute()
         )
+
+    async def asearch(self, query: str, max_results: int = 10) -> list[dict]:
+        return await asyncio.to_thread(self.search, query, max_results)
+
+    async def aread(self, message_id: str) -> dict:
+        return await asyncio.to_thread(self.read, message_id)
+
+    async def arecent_inbox(
+        self,
+        minutes: int,
+        category: str = "all",
+        max_results: int = 10,
+    ) -> list[dict]:
+        return await asyncio.to_thread(
+            self.recent_inbox,
+            minutes,
+            category,
+            max_results,
+        )
+
+    async def asend(self, to: str, subject: str, body: str) -> dict:
+        return await asyncio.to_thread(self.send, to, subject, body)
+
+    async def ainbox_candidates(self, max_results: int = 50) -> list[dict]:
+        return await asyncio.to_thread(self.inbox_candidates, max_results)
+
+    async def aown_email_address(self) -> str:
+        return await asyncio.to_thread(self.own_email_address)
+
+    async def asend_auto_reply(self, original: dict, body: str) -> dict:
+        return await asyncio.to_thread(self.send_auto_reply, original, body)

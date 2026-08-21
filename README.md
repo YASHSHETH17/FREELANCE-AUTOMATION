@@ -13,7 +13,8 @@ An AI-powered Gmail assistant for freelancers that can search and read email, dr
 - Require human approval before every manual send.
 - Let the reviewer approve, edit, or reject a proposed outgoing email.
 - Prompt for the final email-signature name during human review when the draft contains a name placeholder.
-- Run an optional background monitor that acknowledges new direct human emails once per Gmail thread.
+- Run an optional background monitor that queues every new Inbox message, reports completed work in the terminal, and acknowledges eligible human emails once per Gmail thread.
+- Optionally let the LLM rewrite the approved acknowledgement template without giving it permission to choose recipients or send mail.
 - Provide dry-run mode and an audit log for automatic replies.
 
 ## Project Structure
@@ -21,16 +22,17 @@ An AI-powered Gmail assistant for freelancers that can search and read email, dr
 ```text
 FREELANCE-AUTOMATION/
 ├── src/
-│   ├── agent.py          # LangChain agent and HITL middleware configuration
-│   ├── auth.py           # Gmail OAuth credential loading and refresh
-│   ├── auto_reply.py     # Background automatic-acknowledgement monitor
-│   ├── config.py         # Environment configuration
-│   ├── gmail_client.py   # Gmail API wrapper
-│   ├── main.py           # Interactive terminal application
-│   └── tools.py          # Agent tools
-├── .env                  # Local secrets and settings; never commit this
-├── credentials.json      # Google OAuth client credentials; never commit this
-├── token.json            # Gmail OAuth token; never commit this
+│   └── email_agent/
+│       ├── agent.py          # LangChain agent and HITL middleware configuration
+│       ├── auth.py           # Gmail OAuth credential loading and refresh
+│       ├── auto_reply.py     # Background queue, worker, and notifications
+│       ├── config.py         # Environment configuration
+│       ├── gmail_client.py   # Gmail API wrapper
+│       ├── main.py           # Interactive terminal application
+│       └── tools.py          # Agent tools
+├── .env                      # Local secrets and settings; never commit this
+├── src/email_agent/credentials.json  # OAuth client credentials; never commit this
+├── src/email_agent/token.json        # Gmail OAuth token; never commit this
 └── requirements.txt
 ```
 
@@ -55,8 +57,10 @@ LLM_MODEL_NAME=your-model-name
 LLM_BASE_URL=https://your-host/v1
 
 # Automatic reply settings
+BACKGROUND_INBOX_ENABLED=false
 AUTO_REPLY_ENABLED=false
 AUTO_REPLY_DRY_RUN=true
+AUTO_REPLY_REWRITE_ENABLED=false
 AUTO_REPLY_POLL_SECONDS=60
 AUTO_REPLY_MAX_PER_HOUR=10
 AUTO_REPLY_BODY=Thank you for your email. I have received your message and will connect with you shortly.
@@ -64,18 +68,18 @@ AUTO_REPLY_BODY=Thank you for your email. I have received your message and will 
 
 ### 3. Add Gmail OAuth credentials
 
-Place your Google OAuth Desktop App credentials in the project root as:
+Place your Google OAuth Desktop App credentials at:
 
 ```text
-credentials.json
+src/email_agent/credentials.json
 ```
 
-On the first run, the app opens a browser for Google authorization and creates `token.json`. The configured scopes allow Gmail read access and sending messages.
+On the first run, the app opens a browser for Google authorization and creates `src/email_agent/token.json`. The configured scopes allow Gmail read access and sending messages.
 
 ## Run the Assistant
 
 ```bash
-python src/main.py
+python -m src.email_agent.main
 ```
 
 Examples:
@@ -109,7 +113,9 @@ If the draft has a signature placeholder such as `[Your Name]`, the HITL flow as
 
 ## Automatic Acknowledgements
 
-The optional auto-reply monitor runs alongside the terminal assistant. It does not use the LLM to generate outgoing content: it sends only the fixed `AUTO_REPLY_BODY` from `.env`.
+The optional background monitor runs alongside the terminal assistant. It discovers new Inbox messages without requiring a manual “check mail” request, queues them, and prints a bulleted summary after the current terminal task reaches a safe boundary. Enable it with `BACKGROUND_INBOX_ENABLED=true`.
+
+Only eligible direct human messages are sent an automatic acknowledgement when `AUTO_REPLY_ENABLED=true`. By default, the worker sends the fixed `AUTO_REPLY_BODY` from `.env`. If `AUTO_REPLY_REWRITE_ENABLED=true`, the LLM may rewrite that template in a friendly tone; it does not receive Gmail tools, choose recipients, or decide whether a message is eligible.
 
 ### Safety policy
 
@@ -128,11 +134,12 @@ It also limits replies to `AUTO_REPLY_MAX_PER_HOUR` and records a startup baseli
 Use this first:
 
 ```dotenv
+BACKGROUND_INBOX_ENABLED=true
 AUTO_REPLY_ENABLED=true
 AUTO_REPLY_DRY_RUN=true
 ```
 
-Restart the app, then send a **new** email from another account. The terminal logs an `AUTO-REPLY DRY RUN` record but Gmail sends nothing.
+Restart the app, then send a **new** email from another account. After the background task completes, the terminal prints a bullet containing the sender, subject, timestamp, and whether an auto-reply was sent or skipped. Gmail sends nothing in dry-run mode.
 
 Review the history from the running assistant:
 
@@ -161,8 +168,8 @@ Send a new test email after startup. Previously handled dry-run messages are int
 Automatic-reply state and audit history are stored locally:
 
 ```text
-.auto_reply_state.json
-auto_reply_log.csv
+src/email_agent/.auto_reply_state.json
+src/email_agent/auto_reply_log.csv
 ```
 
 The CSV audit log records delivery metadata such as timestamp, sender, subject, Gmail thread ID, and message ID. It does not store email bodies.
@@ -179,6 +186,8 @@ token.json
 auto_reply_log.csv
 __pycache__/
 *.pyc
+venv/
+.venv/
 ```
 
 Keep automatic replies in dry-run mode until you have verified the recipient filtering and message text using a separate test account.
@@ -186,6 +195,7 @@ Keep automatic replies in dry-run mode until you have verified the recipient fil
 ## Tech Stack
 
 - Python
+- asyncio with non-blocking background queues
 - LangChain and LangGraph
 - Human-in-the-Loop middleware
 - Gmail API with Google OAuth 2.0
