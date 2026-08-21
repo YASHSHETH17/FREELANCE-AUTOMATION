@@ -1,0 +1,4 @@
+sent_at,status,recipient,subject,thread_id,message_id
+2026-08-21T07:15:48.212046+00:00,dry_run,yash <shocked.jammer@gmail.com>,test mail,1a0232c556a6ce14,1a0232c556a6ce14
+2026-08-21T07:17:44.425328+00:00,sent,yash <shocked.jammer@gmail.com>,test mail,1a0232e92916c5fa,1a0232e92916c5fa
+2026-08-21T07:19:10.440254+00:00,sent,Lovekesh Shukla <lovekesh.koffeekodes@gmail.com>,Re: test mail,1a022da8a9b2a63a,1a0232fc09b17472
