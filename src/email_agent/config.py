@@ -26,8 +26,16 @@ def _positive_int(name: str, default: int, minimum: int) -> int:
 # Automatic replies are deliberately opt-in. They bypass HITL only after the
 # direct-human checks in auto_reply.py pass.
 AUTO_REPLY_ENABLED = os.getenv("AUTO_REPLY_ENABLED", "false").lower() == "true"
+# Monitoring can run without sending any automatic replies. If the new setting
+# is absent, preserve the old behavior and follow AUTO_REPLY_ENABLED.
+BACKGROUND_INBOX_ENABLED = os.getenv(
+    "BACKGROUND_INBOX_ENABLED", "true" if AUTO_REPLY_ENABLED else "false"
+).lower() == "true"
 # Start in observation mode. Set this to false only after a dry-run test.
 AUTO_REPLY_DRY_RUN = os.getenv("AUTO_REPLY_DRY_RUN", "true").lower() == "true"
+AUTO_REPLY_REWRITE_ENABLED = (
+    os.getenv("AUTO_REPLY_REWRITE_ENABLED", "false").lower() == "true"
+)
 AUTO_REPLY_POLL_SECONDS = _positive_int("AUTO_REPLY_POLL_SECONDS", 60, 30)
 AUTO_REPLY_MAX_PER_HOUR = _positive_int("AUTO_REPLY_MAX_PER_HOUR", 10, 1)
 AUTO_REPLY_BODY = os.getenv(
