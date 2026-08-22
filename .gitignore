@@ -13,3 +13,6 @@ venv/
 
 .auto_reply_state.json
 .auto_reply_log.csv
+
+# Generated lead workbooks may contain business contact information
+/outputs/leads/
